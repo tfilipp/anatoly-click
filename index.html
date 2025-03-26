@@ -1,0 +1,898 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Анатолий Кликер</title>
+    <link href="https://fonts.googleapis.com/css2?family=Handjet:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Handjet', cursive;
+            letter-spacing: 1px;
+        }
+
+        :root {
+            --main-bg: #1a1a1a;
+            --panel-bg: rgba(42, 42, 42, 0.7);
+            --accent: #4a90e2;
+            --accent-hover: #357abd;
+            --text: #ffffff;
+            --disabled: #666666;
+            --success: #43a047;
+            --button-bg: rgba(51, 51, 51, 0.8);
+            --button-hover: rgba(68, 68, 68, 0.9);
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.02); }
+            100% { transform: scale(1); }
+        }
+
+        @keyframes titleReveal {
+            0% { 
+                opacity: 0;
+                transform: scale(0.8);
+                letter-spacing: -25px;
+            }
+            75% {
+                letter-spacing: 20px;
+            }
+            100% { 
+                opacity: 1;
+                transform: scale(1);
+                letter-spacing: 10px;
+            }
+        }
+        @keyframes titleRevealMini {
+            0% { 
+                opacity: 0;
+                transform: scale(0.5);
+                letter-spacing: -25px;
+            }
+            25% {
+                letter-spacing: 20px;
+            }
+            75% { 
+                opacity: 1;
+                transform: scale(1);
+                letter-spacing: 10px;
+            }
+        }
+
+        @keyframes fadeOut {
+            0% { opacity: 1; }
+            100% { opacity: 0; }
+        }
+
+        body {
+            background: linear-gradient(45deg, #1a1a1a, #2a2a2a, #1a1a1a);
+            background-size: 200% 200%;
+            animation: backgroundPulse 10s ease infinite;
+            color: var(--text);
+            line-height: 1.6;
+            min-height: 100vh;
+            margin: 0;
+            padding: 0;
+            font-size: 18px;
+        }
+
+        #intro-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.9);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+        }
+
+        #intro-title {
+            font-size: 4em;
+            font-weight: bold;
+            color: white;
+            text-shadow: 0 0 20px rgba(74, 144, 226, 0.5);
+            animation: titleReveal 2s ease-out forwards;
+            white-space: nowrap;
+        }
+        #intro-title-mini {
+            font-size: 2em;
+            font-weight: 300;
+            color: white;
+            text-shadow: 0 0 20px rgba(74, 144, 226, 0.5);
+            animation: titleRevealMini 2s ease-out forwards;
+            white-space: nowrap;
+        }
+
+        #game {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            opacity: 0;
+            transition: opacity 1s ease;
+        }
+
+        .tabs {
+            position: sticky;
+            top: 0;
+            background: rgba(26, 26, 26, 0.8);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            padding: 15px;
+            display: flex;
+            gap: 10px;
+            z-index: 1000;
+            border-radius: 23px;
+        }
+
+        .tab {
+            flex: 1;
+            padding: 12px 20px;
+            background: var(--button-bg);
+            backdrop-filter: blur(5px);
+            -webkit-backdrop-filter: blur(5px);
+            cursor: pointer;
+            border-radius: 8px;
+            text-align: center;
+            transition: all 0.3s ease;
+            font-weight: 300;
+            user-select: none;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            font-size: 1.2em;
+        }
+
+        .tab:hover {
+            background: var(--button-hover);
+            transform: translateY(-2px);
+            padding: 12px 18px;
+            font-weight: 400;
+        }
+
+        .tab.active {
+            background: var(--accent);
+            color: white;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(74, 144, 226, 0.3);
+            padding: 12px 100px;
+            font-size: 1.5em;
+            font-weight: 550;
+        }
+
+        .content {
+            display: none;
+            padding: 20px;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .content.active {
+            display: block;
+        }
+
+        #cube {
+            width: 400px;
+            height: 400px;
+            background: linear-gradient(135deg, rgba(51, 51, 51, 0.8) 0%, rgba(42, 42, 42, 0.8) 100%);
+            backdrop-filter: blur(5px);
+            -webkit-backdrop-filter: blur(5px);
+            margin: 20px auto;
+            cursor: pointer;
+            border-radius: 15px;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.3);
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            animation: pulse 2s infinite ease-in-out;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        #cube:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 30px rgba(74, 144, 226, 0.4);
+        }
+
+        #cube:active {
+            transform: scale(0.95);
+            box-shadow: 0 5px 10px rgba(0,0,0,0.2);
+        }
+
+        #cube-text {
+            color: #555;
+            font-size: 28px;
+            font-weight: bold;
+            text-shadow:
+    /* Shadow on the inside top */
+    0 2px 0 #999,
+    /* Shadow on the inside right */
+    -2px 0 0 #999,
+    /* Shadow on the inside bottom */
+    0 -2px 0 #999,
+    /* Shadow on the inside left */
+    2px 0 0 #999;
+        }
+
+        #stats {
+            background: var(--panel-bg);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            padding: 20px;
+            border-radius: 15px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+            margin: 20px auto;
+            max-width: 400px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            font-size: 1.2em;
+        }
+
+        .stat-value {
+            color: var(--accent);
+            font-weight: bold;
+            font-size: 1.2em;
+            text-shadow: 0 0 10px rgba(74, 144, 226, 0.3);
+        }
+
+        #ascend-btn {
+            background: linear-gradient(135deg, rgba(255, 215, 0, 0.8) 0%, rgba(255, 165, 0, 0.8) 100%);
+            backdrop-filter: blur(5px);
+            -webkit-backdrop-filter: blur(5px);
+            padding: 15px 30px;
+            border-radius: 10px;
+            cursor: pointer;
+            margin: 20px auto;
+            max-width: 400px;
+            font-weight: bold;
+            box-shadow: 0 5px 15px rgba(255, 215, 0, 0.3);
+            transition: all 0.3s ease;
+            text-align: center;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            font-size: 1.2em;
+        }
+
+        #ascend-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(255, 215, 0, 0.4);
+        }
+
+        .building, .upgrade {
+            background: var(--panel-bg);
+            backdrop-filter: blur(5px);
+            -webkit-backdrop-filter: blur(5px);
+            padding: 20px;
+            margin: 15px 0;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            font-size: 1.1em;
+        }
+
+        .building:hover, .upgrade:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(74, 144, 226, 0.3);
+        }
+
+        .building.disabled, .upgrade.disabled {
+            opacity: 0.7;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        .building-name, .upgrade-name {
+            font-size: 1.2em;
+            font-weight: bold;
+            margin-bottom: 5px;
+            color: var(--accent);
+            text-shadow: 0 0 10px rgba(74, 144, 226, 0.2);
+        }
+
+        .building-cost, .upgrade-cost {
+            color: #ffd700;
+            font-weight: bold;
+            text-shadow: 0 0 10px rgba(255, 215, 0, 0.2);
+        }
+
+        .building-production {
+            color: var(--success);
+            text-shadow: 0 0 10px rgba(67, 160, 71, 0.2);
+        }
+
+        .notification {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: var(--success);
+            color: white;
+            padding: 15px 25px;
+            border-radius: 8px;
+            animation: fadeIn 0.3s ease;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+            z-index: 1000;
+            backdrop-filter: blur(5px);
+            -webkit-backdrop-filter: blur(5px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            font-size: 1.1em;
+        }
+
+        #profile-stats {
+            background: var(--panel-bg);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            padding: 20px;
+            border-radius: 15px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+            margin: 20px 0;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .profile-stat {
+            margin: 10px 0;
+            padding: 10px;
+            background: rgba(51, 51, 51, 0.5);
+            backdrop-filter: blur(5px);
+            -webkit-backdrop-filter: blur(5px);
+            border-radius: 8px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            font-size: 1.1em;
+        }
+
+        .profile-stat-label {
+            color: var(--accent);
+            font-weight: bold;
+            text-shadow: 0 0 10px rgba(74, 144, 226, 0.2);
+        }
+
+        #anatoly-content {
+            text-align: center;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Общие медиа-запросы для мобильных устройств */
+@media (max-width: 768px) {
+    /* Структура страницы для мобильных устройств */
+    #game {
+        display: flex;
+        flex-direction: column;
+        min-height: 100vh;
+        padding: 10px;
+        padding-bottom: 70px; /* Оставляем место для tabs */
+    }
+
+    .tabs {
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        padding: 10px;
+        gap: 5px;
+        background: rgba(26, 26, 26, 0.95);
+        border-radius: 23px 23px 0 0;
+        z-index: 1000;
+    }
+
+    .content {
+        margin-bottom: 60px; /* Отступ для контента над tabs */
+    }
+
+    /* Стили элементов */
+    #intro-title {
+        font-size: 2em;
+        letter-spacing: 3px;
+    }
+
+    #intro-title-mini {
+        font-size: 1.5em;
+    }
+
+    .tab {
+        flex: 1 1 100%;
+        padding: 8px 15px;
+        font-size: 1em;
+        border-radius: 12px;
+    }
+
+    .tab.active {
+        padding: 8px 15px;
+        font-size: 1.2em;
+    }
+
+    #cube {
+        width: 280px;
+        height: 280px;
+        margin: 15px auto;
+    }
+
+    #stats {
+        width: 90%;
+        margin: 15px auto;
+        font-size: 1em;
+    }
+
+    .building, .upgrade {
+        padding: 15px;
+        margin: 10px 0;
+        font-size: 0.9em;
+    }
+
+    .building-name, .upgrade-name {
+        font-size: 1.1em;
+    }
+
+    .notification {
+        width: 90%;
+        left: 50%;
+        transform: translateX(-50%);
+        bottom: 80px; /* Подняли уведомления выше tabs */
+        font-size: 0.9em;
+        text-align: center;
+    }
+
+    #profile-stats {
+        padding: 15px;
+        margin: 15px 0;
+    }
+
+    .profile-stat {
+        padding: 8px;
+        font-size: 0.9em;
+    }
+
+    #ascend-btn {
+        width: 90%;
+        padding: 12px 20px;
+        font-size: 1.1em;
+        margin: 15px auto;
+    }
+
+    /* Стили для скролла */
+    .content {
+        overflow-y: auto;
+        -webkit-overflow-scrolling: touch;
+        padding-bottom: 20px;
+    }
+}
+
+/* Дополнительные настройки для очень маленьких экранов */
+@media (max-width: 380px) {
+    #intro-title {
+        font-size: 1.5em;
+    }
+
+    #intro-title-mini {
+        font-size: 1.2em;
+    }
+
+    #cube {
+        width: 240px;
+        height: 240px;
+    }
+
+    .stat-value {
+        font-size: 1em;
+    }
+
+    .building, .upgrade {
+        padding: 12px;
+        font-size: 0.8em;
+    }
+
+    .tabs {
+        padding: 8px;
+    }
+
+    .tab {
+        padding: 6px 10px;
+        font-size: 0.9em;
+    }
+}
+
+/* Для горизонтальной ориентации мобильных устройств */
+@media (max-height: 500px) and (orientation: landscape) {
+    #game {
+        padding-bottom: 60px;
+    }
+
+    #cube {
+        width: 200px;
+        height: 200px;
+        margin: 10px auto;
+    }
+
+    #stats {
+        margin: 10px auto;
+        padding: 10px;
+    }
+
+    .tabs {
+        padding: 8px;
+    }
+
+    .tab {
+        padding: 6px 12px;
+    }
+
+    .content {
+        margin-bottom: 50px;
+    }
+}
+
+/* Для обработки очень высоких экранов */
+@media (min-height: 800px) {
+    #game {
+        padding-bottom: 80px;
+    }
+
+    .tabs {
+        padding: 15px;
+    }
+
+    .tab {
+        padding: 10px 20px;
+    }
+}
+
+/* Для предотвращения проблем с bottom bar на iOS */
+@supports (-webkit-touch-callout: none) {
+    #game {
+        padding-bottom: calc(70px + env(safe-area-inset-bottom));
+    }
+
+    .tabs {
+        padding-bottom: calc(10px + env(safe-area-inset-bottom));
+    }
+}
+    </style>
+</head>
+<body>
+    <div id="intro-screen">
+        <div id="intro-title">АНАТОЛИЙ КЛИКЕР</div>
+        <div id="intro-title-mini">by amoeba</div>
+    </div>
+
+    <div id="game">
+        <div class="tabs">
+            <div class="tab active" onclick="showTab('anatoly')">анатолий</div>
+            <div class="tab" onclick="showTab('buildings')">здания</div>
+            <div class="tab" onclick="showTab('upgrades')">улучшения</div>
+            <div class="tab" onclick="showTab('profile')">профиль</div>
+        </div>
+
+        <div id="anatoly-content" class="content active">
+            <div id="cube">
+                <div id="cube-text">анатолий</div>
+            </div>
+            <div id="stats">
+                <div>толиков: <span id="shungite" class="stat-value">0</span></div>
+                <div>за клик: <span id="per-click" class="stat-value">1</span></div>
+                <div>в секунду: <span id="per-second" class="stat-value">0</span></div>
+                <div>перерождений: <span id="ascensions" class="stat-value">0</span></div>
+            </div>
+            <div id="ascend-btn" style="display: none;">Переродиться</div>
+        </div>
+
+        <div id="buildings-content" class="content">
+            <div id="buildings-container"></div>
+        </div>
+
+        <div id="upgrades-content" class="content">
+            <div id="upgrades-container"></div>
+        </div>
+
+        <div id="profile-content" class="content">
+            <div id="profile-stats">
+                <h2>Статистика</h2>
+                <div class="profile-stat">
+                    <span class="profile-stat-label">Всего добыто шунгита:</span>
+                    <span id="total-shungite">0</span>
+                </div>
+                <div class="profile-stat">
+                    <span class="profile-stat-label">Кликов сделано:</span>
+                    <span id="total-clicks">0</span>
+                </div>
+                <div class="profile-stat">
+                    <span class="profile-stat-label">Улучшений куплено:</span>
+                    <span id="total-upgrades">0</span>
+                </div>
+                <div class="profile-stat">
+                    <span class="profile-stat-label">Зданий построено:</span>
+                    <span id="total-buildings">0</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const buildings = [
+            {id: 'legs', name: 'Ноги', baseCost: 15, baseProduction: 0.5},
+            {id: 'cubic', name: 'Кубическое', baseCost: 100, baseProduction: 2},
+            {id: 'farm', name: 'Ферма', baseCost: 1100, baseProduction: 10},
+            {id: 'quarry', name: 'Карьер', baseCost: 12000, baseProduction: 47},
+            {id: 'factory', name: 'Фабрика', baseCost: 130000, baseProduction: 260},
+            {id: 'synthesis', name: 'Синтез угля', baseCost: 1400000, baseProduction: 1400},
+            {id: 'portal', name: 'Портал в Карелию', baseCost: 20000000, baseProduction: 7800},
+            {id: 'temple', name: 'Храм Шунгита', baseCost: 330000000, baseProduction: 44000},
+            {id: 'dimension', name: 'Измерение Анатолия', baseCost: 5100000000, baseProduction: 260000},
+            {id: 'timeline', name: 'Временная Линия', baseCost: 75000000000, baseProduction: 1600000},
+            {id: 'reality', name: 'Реальность Шунгита', baseCost: 1000000000000, baseProduction: 10000000},
+            {id: 'multiverse', name: 'Мультивселенная', baseCost: 14000000000000, baseProduction: 65000000},
+            {id: 'quantum', name: 'Квантовый Резонатор', baseCost: 170000000000000, baseProduction: 430000000},
+            {id: 'infinity', name: 'Бесконечный Куб', baseCost: 2100000000000000, baseProduction: 2900000000},
+            {id: 'beyond', name: 'За Гранью', baseCost: 26000000000000000, baseProduction: 21000000000},
+            {id: 'eternal', name: 'Вечный Анатолий', baseCost: 310000000000000000, baseProduction: 150000000000},
+            {id: 'cosmic', name: 'Космический Шунгит', baseCost: 4100000000000000000, baseProduction: 1100000000000},
+            {id: 'divine', name: 'Божественный Куб', baseCost: 51000000000000000000, baseProduction: 8400000000000},
+            {id: 'omnipotent', name: 'Всемогущий Анатолий', baseCost: 630000000000000000000, baseProduction: 65000000000000},
+            {id: 'ultimate', name: 'Абсолютный Шунгит', baseCost: 7800000000000000000000, baseProduction: 510000000000000}
+        ];
+
+        const upgrades = [
+            {id: 'click1', name: 'Усиленный клик', cost: 100, type: 'click', multiplier: 2},
+            {id: 'click2', name: 'Мощный клик', cost: 500, type: 'click', multiplier: 2},
+            {id: 'click3', name: 'Супер клик', cost: 10000, type: 'click', multiplier: 2},
+            {id: 'click4', name: 'Мега клик', cost: 100000, type: 'click', multiplier: 2},
+            {id: 'click5', name: 'Ультра клик', cost: 1000000, type: 'click', multiplier: 2},
+            
+            {id: 'legs1', name: 'Быстрые ноги', cost: 100, type: 'building', building: 'legs', multiplier: 2},
+            {id: 'legs2', name: 'Скоростные ноги', cost: 500, type: 'building', building: 'legs', multiplier: 2},
+            {id: 'legs3', name: 'Турбо ноги', cost: 1000, type: 'building', building: 'legs', multiplier: 2},
+            
+            {id: 'cubic1', name: 'Острые грани', cost: 1000, type: 'building', building: 'cubic', multiplier: 2},
+            {id: 'cubic2', name: 'Идеальный куб', cost: 5000, type: 'building', building: 'cubic', multiplier: 2},
+            {id: 'cubic3', name: 'Гиперкуб', cost: 10000, type: 'building', building: 'cubic', multiplier: 2},
+            
+            {id: 'global1', name: 'Энергия шунгита', cost: 1000000, type: 'global', multiplier: 2},
+            {id: 'global2', name: 'Сила Анатолия', cost: 10000000, type: 'global', multiplier: 2},
+            {id: 'global3', name: 'Космическая мощь', cost: 100000000, type: 'global', multiplier: 2},
+            {id: 'global4', name: 'Божественное благословение', cost: 1000000000, type: 'global', multiplier: 2},
+        ];
+
+        let gameState = {
+            shungite: 0,
+            clickPower: 1,
+            buildings: {},
+            upgrades: {},
+            ascensions: 0,
+            lastSave: Date.now(),
+            stats: {
+                totalShungite: 0,
+                totalClicks: 0,
+                totalUpgrades: 0,
+                totalBuildings: 0
+            }
+        };
+
+        buildings.forEach(building => {
+            gameState.buildings[building.id] = {
+                count: 0,
+                multiplier: 1
+            };
+        });
+
+        function showNotification(message) {
+            const notification = document.createElement('div');
+            notification.className = 'notification';
+            notification.textContent = message;
+            document.body.appendChild(notification);
+            setTimeout(() => notification.remove(), 2000);
+        }
+
+        function formatNumber(num) {
+            if (num >= 1e6) {
+                return num.toExponential(2);
+            }
+            return num.toLocaleString(undefined, {
+                minimumFractionDigits: 0,
+                maximumFractionDigits: 1
+            });
+        }
+
+        function calculateBuildingCost(building, count) {
+            return Math.floor(building.baseCost * Math.pow(1.15, count));
+        }
+
+        function calculateProduction() {
+            let total = 0;
+            buildings.forEach(building => {
+                const buildingState = gameState.buildings[building.id];
+                total += building.baseProduction * buildingState.count * buildingState.multiplier;
+            });
+            return total * (1 + gameState.ascensions * 0.1);
+        }
+
+        function updateDisplay() {
+            document.getElementById('shungite').textContent = formatNumber(gameState.shungite);
+            document.getElementById('per-click').textContent = formatNumber(gameState.clickPower);
+            document.getElementById('per-second').textContent = formatNumber(calculateProduction());
+            document.getElementById('ascensions').textContent = gameState.ascensions;
+            
+            document.getElementById('ascend-btn').style.display = 
+                gameState.shungite >= 1000000 ? 'block' : 'none';
+
+            updateProfile();
+        }
+
+        function updateProfile() {
+            document.getElementById('total-shungite').textContent = formatNumber(gameState.stats.totalShungite);
+            document.getElementById('total-clicks').textContent = formatNumber(gameState.stats.totalClicks);
+            document.getElementById('total-upgrades').textContent = formatNumber(gameState.stats.totalUpgrades);
+            document.getElementById('total-buildings').textContent = formatNumber(gameState.stats.totalBuildings);
+        }
+
+        function updateBuildings() {
+            const container = document.getElementById('buildings-container');
+            container.innerHTML = '';
+            
+            buildings.forEach(building => {
+                const buildingState = gameState.buildings[building.id];
+                const cost = calculateBuildingCost(building, buildingState.count);
+                const canBuy = gameState.shungite >= cost;
+                
+                const element = document.createElement('div');
+                element.className = `building ${canBuy ? '' : 'disabled'}`;
+                element.innerHTML = `
+                    <div class="building-name">${building.name} (${buildingState.count})</div>
+                    <div class="building-cost">Стоимость: ${formatNumber(cost)}</div>
+                    <div class="building-production">Производство: ${formatNumber(building.baseProduction * buildingState.multiplier)}/сек</div>
+                `;
+                
+                element.onclick = () => buyBuilding(building.id);
+                container.appendChild(element);
+            });
+        }
+
+        function updateUpgrades() {
+            const container = document.getElementById('upgrades-container');
+            container.innerHTML = '';
+            
+            upgrades.forEach(upgrade => {
+                if (gameState.upgrades[upgrade.id]) return;
+                
+                const element = document.createElement('div');
+                element.className = `upgrade ${gameState.shungite >= upgrade.cost ? '' : 'disabled'}`;
+                element.innerHTML = `
+                    <div class="upgrade-name">${upgrade.name}</div>
+                    <div class="upgrade-cost">Стоимость: ${formatNumber(upgrade.cost)}</div>
+                `;
+                
+                element.onclick = () => buyUpgrade(upgrade.id);
+                container.appendChild(element);
+            });
+        }
+
+        function buyBuilding(id) {
+            const building = buildings.find(b => b.id === id);
+            const buildingState = gameState.buildings[id];
+            const cost = calculateBuildingCost(building, buildingState.count);
+            
+            if (gameState.shungite >= cost) {
+                gameState.shungite -= cost;
+                buildingState.count++;
+                gameState.stats.totalBuildings++;
+                showNotification(`Куплено: ${building.name}`);
+                updateDisplay();
+                updateBuildings();
+            }
+        }
+
+        function buyUpgrade(id) {
+            const upgrade = upgrades.find(u => u.id === id);
+            
+            if (gameState.shungite >= upgrade.cost && !gameState.upgrades[id]) {
+                gameState.shungite -= upgrade.cost;
+                gameState.upgrades[id] = true;
+                gameState.stats.totalUpgrades++;
+                
+                if (upgrade.type === 'click') {
+                    gameState.clickPower *= upgrade.multiplier;
+                } else if (upgrade.type === 'building') {
+                    gameState.buildings[upgrade.building].multiplier *= upgrade.multiplier;
+                } else if (upgrade.type === 'global') {
+                    buildings.forEach(building => {
+                        gameState.buildings[building.id].multiplier *= upgrade.multiplier;
+                    });
+                }
+                
+                showNotification(`Улучшение активировано: ${upgrade.name}`);
+                updateDisplay();
+                updateUpgrades();
+            }
+        }
+
+        function ascend() {
+            if (gameState.shungite >= 1000000) {
+                gameState.ascensions++;
+                gameState.shungite = 0;
+                gameState.clickPower = 1 * (1 + gameState.ascensions * 0.1);
+                
+                buildings.forEach(building => {
+                    gameState.buildings[building.id].count = 0;
+                });
+                
+                showNotification('Перерождение завершено! Множитель увеличен.');
+                updateDisplay();
+                updateBuildings();
+                saveGame();
+            }
+        }
+
+        function showTab(tab) {
+            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+            document.querySelector(`.tab[onclick="showTab('${tab}')"]`).classList.add('active');
+            
+            document.querySelectorAll('.content').forEach(c => c.classList.remove('active'));
+            document.getElementById(`${tab}-content`).classList.add('active');
+
+            if (tab === 'buildings') updateBuildings();
+            if (tab === 'upgrades') updateUpgrades();
+        }
+
+        function saveGame() {
+            localStorage.setItem('shungiteClickerSave', JSON.stringify(gameState));
+        }
+
+        function loadGame() {
+            const savedGame = localStorage.getItem('shungiteClickerSave');
+            if (savedGame) {
+                gameState = JSON.parse(savedGame);
+                if (!gameState.stats) {
+                    gameState.stats = {
+                        totalShungite: 0,
+                        totalClicks: 0,
+                        totalUpgrades: 0,
+                        totalBuildings: 0
+                    };
+                }
+                updateDisplay();
+            }
+        }
+
+        window.addEventListener('load', () => {
+            setTimeout(() => {
+                const introScreen = document.getElementById('intro-screen');
+                const game = document.getElementById('game');
+                
+                introScreen.style.animation = 'fadeOut 1s ease forwards';
+                game.style.opacity = '1';
+                
+                setTimeout(() => {
+                    introScreen.style.display = 'none';
+                }, 1000);
+            }, 2000);
+        });
+
+        document.getElementById('cube').onclick = () => {
+            gameState.shungite += gameState.clickPower;
+            gameState.stats.totalShungite += gameState.clickPower;
+            gameState.stats.totalClicks++;
+            updateDisplay();
+        };
+
+        document.getElementById('ascend-btn').onclick = ascend;
+
+        setInterval(() => {
+            const now = Date.now();
+            const delta = (now - gameState.lastSave) / 1000;
+            const production = calculateProduction() * delta;
+            gameState.shungite += production;
+            gameState.stats.totalShungite += production;
+            gameState.lastSave = now;
+            updateDisplay();
+            saveGame();
+        }, 1000);
+
+        loadGame();
+        updateDisplay();
+    </script>
+</body>
+</html>
